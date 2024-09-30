@@ -35,7 +35,11 @@ health: 10,
 inventory: ["sword", "potion", "artifact"],
 companion: {
     name: "Leo",
-    type: "Cat"
+    type: "Cat",
+    companion: {
+        name: "Frank",
+        type: "flea"
+    }
 },
 roll (mod = 0) {
 const result = Math.floor(Math.random() * 20) + 1 + mod;
@@ -170,8 +174,66 @@ const robin = healers.generate("Robin");
 // Log the winner of the duel: the adventurer still above 50 health.
 // What other properties and methods could these classes have? Should fighters, healers, and wizards have their own methods? Should companions have specific methods?
 // Feel free to experiment with your own ideas, be they silly or practical. The goal of this exercise is to develop new skills for the characters and yourself! Express your creativity.
+class Adventurer extends Character {
+    constructor(name, role) {
+      super(name);
+      if (!Adventurer.ROLES.includes(role)) {
+        throw new Error(`Invalid role: ${role}. Valid roles are: ${Adventurer.ROLES.join(', ')}`);
+      }
+      this.role = role;
+      this.inventory.push("bedroll", "50 gold coins");
+    }
+  
+    scout() {
+      console.log(`${this.name} is scouting ahead...`);
+      this.roll();
+    }
+  
+    duel(opponent) {
+      console.log(`${this.name} has challenged ${opponent.name} to a duel!`);
+  
+      while (this.health > 50 && opponent.health > 50) {
+        const myRoll = this.roll();
+        const opponentRoll = opponent.roll();
+  
+        if (myRoll > opponentRoll) {
+          opponent.health -= 1;
+          console.log(`${this.name} wins this round! ${opponent.name}'s health is now ${opponent.health}.`);
+        } else if (opponentRoll > myRoll) {
+          this.health -= 1;
+          console.log(`${opponent.name} wins this round! ${this.name}'s health is now ${this.health}.`);
+        } else {
+          console.log("It's a tie this round!");
+        }
+  
+        console.log(`${this.name} has ${this.health} health, ${opponent.name} has ${opponent.health} health.`);
+      }
+  
+      const winner = this.health > 50 ? this : opponent;
+      console.log(`${winner.name} wins the duel with ${winner.health} health remaining!`);
+    }
+  
+    rest() {
+      console.log(`${this.name} is resting...`);
+      this.health = Math.min(this.health + 20, Character.MAX_HEALTH);
+      console.log(`${this.name} now has ${this.health} health.`);
+    }
+  }
+
+  Adventurer.ROLES = ["Fighter", "Healer", "Wizard"];
+
+
+  
 // Part 7: Adventure Forth
 // Now that you have convenient ways to create a variety of characters with a variety of methods, experiment! Generate a whole host of adventurers and their companions, and have them interact using the instance methods you have developed.
+const fighter1 = new Adventurer("Legolas", "Fighter");
+const fighter2 = new Adventurer("Aragorn", "Fighter");
+const wizard1 = new Adventurer("Gandolf", "Wizard");
+const wizard2 = new Adventurer("Sarumon", "Wizard");
+
+fighter1.duel(fighter2);
+fighter1.scout()
+wizard1.rest()
 // If time allows, create other classes that can interact with your characters; perhaps more characters, but in a different direction from adventurers or companions – dragons, orcs, elves, vampires...
 // You can also create classes for the inventory itself, and include inventory methods such as adding, removing, searching, selling, trading. Even individual items could be their own classes, and have properties and methods specific to the type of item.
 // While this activity is intended to be light-hearted and silly, every tool you have utilized thus far is extremely common and relevant in every variety of development environment, from game development to data processing to complex enterprise applications.
